@@ -29,6 +29,22 @@ const createBlog = async function (req, res) {
 }
 
 
+const getAllBlogs = async function (req, res) {
+    try {
+        const data = req.query
+        if (Object.keys(data) == 0) return res.status(400).send({ status: false, msg: "No input provided" })
+
+        const blogs = await BlogModel.find(data, { isDeleted: false }, { isPublished: true }).populate("authorId")
+        if (blogs.length == 0) return res.status(404).send({ status: false, msg: "No blogs Available." })
+        res.status(200).send({ status: true, data: blogs });
+    }
+
+
+    catch (error) {
+        res.status(500).send({ status: false, msg: error.message });
+    }
+}
+
 
 const updateBlog = async function (req, res) {
     try {
@@ -95,38 +111,14 @@ const deleted = async function (req, res) {
 
 const Qdeleted = async function (req, res) {
     try {
-        const authorId = req.query.authorId;
-        const category = req.query.category;
-        const tags = req.query.tags;
-        const subcategory = req.query.subcategory;
-        const isPublished = req.query.isPublished;
+        const data = req.query
+        if (Object.keys(data) == 0) return res.status(400).send({ status: false, msg: "No input provided" })
+        const deleteBYquery = await BlogModel.updateMany(data, { isDeleted: true, deletedAt: new Date() }, { new: true })
+        if (!deleteBYquery) return res.status(404).send({ status: false, msg: "no such blog found" })
+        res.status(200).send({ status: true, msg: deleteBYquery })
+    }
 
-        //Validate :  All fields (category, authorid, tag name, subcategory name, unpublished
-        // if (!autherid || !category || !tag || !subcategory || !unpublished) {
-        //     return res.status(400).send({ status: false, msg: "Please enter all the necessary fields" })
-        // }
 
-        const Del = await BlogModel.find({
-            $or: [
-                { authorId: authorId },
-                { category: category },
-                { tag: tags },
-                { subcategory: subcategory },
-                { unpublished: isPublished },
-            ],
-        }).select({ isDeleted: 1 });
-
-        //When condition isDeleted  is false and then we are going to update it
-        if (Del === false) {
-            const PDeleted = await Del.updateMany(
-                { $set: { isDeleted: true, deletedAt: new Date() } },
-                { new: true });
-
-            res.status(200).send({ status: true, data: PDeleted });
-        }
-        else if (Del === true) { res.status(404).send("user already deleted") }
-
-    }//when serverside error occur
     catch (error) {
         res.status(500).send({ status: false, msg: error.message });
     }
@@ -134,40 +126,7 @@ const Qdeleted = async function (req, res) {
 
 
 
-const getAllBlogs = async function (req, res) {
-    try {
 
-        let authorId = req.query.authorId;
-        let tags = req.query.tags;
-        let category = req.query.category;
-        let subCategory = req.query.subcategory;
-
-        let retBlogs = [];
-
-        // const blogs = await blogsModel.find({$and :[{isDeleted: false},{isPublished:true}]});
-        const blogs = await BlogModel.find({ isDeleted: false, isPublished: true });
-        if (!blogs) {
-            res.status(404).send({ status: false, msg: "No blogs Available." });
-        }
-        else {
-            // let result = await BlogModel.find({ $or: [{ authorId: req.query.authorId }, { tags: req.query.tags }, { category: req.query.category }, { subcategory: req.query.subcategory }] });
-            for (let i = 0; i < blogs.length; i++) {
-
-                if (null != authorId && blogs[i].authorId != authorId) continue;
-                if (null != tags && blogs[i].tags != tags) continue;
-                if (null != category && blogs[i].category != category) continue;
-                if (null != subCategory && blogs[i].subCategory != subCategory) continue;
-
-                retBlogs.push(blogs[i]);
-            }
-            res.status(200).send({ status: true, data: retBlogs });
-        }
-    }
-
-    catch (error) {
-        res.status(500).send({ status: false, error: error });
-    }
-}
 
 
 
