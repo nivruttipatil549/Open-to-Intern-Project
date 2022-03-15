@@ -36,7 +36,7 @@ const getAllBlogs = async function (req, res) {
 
         const blogs = await BlogModel.find(data, { isDeleted: false }, { isPublished: true }).populate("authorId")
         if (blogs.length == 0) return res.status(404).send({ status: false, msg: "No blogs Available." })
-        res.status(200).send({ status: true, data: blogs });
+        res.status(200).send({ status: true,count:blogs.length, data: blogs });
     }
 
 
@@ -69,7 +69,7 @@ const updateBlog = async function (req, res) {
             {
                 $set: {
                     title: Title, body: Body, isPublished: true, subcategory: Subcategory,
-                    tags: Tags
+                    tags: Tags, publishedAt: new Date()
                 }
             }, { new: true })
         //Sending the updated response
