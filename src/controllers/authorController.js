@@ -31,8 +31,8 @@ const login = async function (req, res) {
             userId: userMatch._id.toString()
         }, "Secret-Key")
 
-        res.setHeader("x-api-key", token);
-        res.status(201).send({ status: true, msg: token })
+        res.setHeader("x-api-key", "token");
+        res.status(200).send({ status: true, msg: "You are successfully logged in", token })
 
     }
     catch (error) {

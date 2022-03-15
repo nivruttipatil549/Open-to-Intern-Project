@@ -4,8 +4,10 @@ const BlogModel=require("../models/blogModel")
 const authentication = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
-        if (!token) return res.status(401).send({ status: false, msg: "login is required" })
-        else { next() };
+        if (!token) return res.status(400).send({ status: false, msg: "login is required" })
+        let decodedtoken= jwt.verify(token, "Security-Key")
+        if (!decodedtoken) return res.status(401).send({status: false, msg: "token is invalid"})
+        next();
     }
     catch (error) {
         console.log(error)
