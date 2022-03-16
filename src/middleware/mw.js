@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken")
-const BlogModel=require("../models/blogModel")
+const BlogModel = require("../models/blogModel")
 
 const authentication = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
         if (!token) return res.status(400).send({ status: false, msg: "login is required" })
-        let decodedtoken= jwt.verify(token, "Security-Key")
-        if (!decodedtoken) return res.status(401).send({status: false, msg: "token is invalid"})
+        let decodedtoken = jwt.verify(token, "Secret-Key")
+        if (!decodedtoken) return res.status(401).send({ status: false, msg: "token is invalid" })
         next();
     }
     catch (error) {
@@ -19,15 +19,21 @@ const authorisation = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key"];
         let decodedtoken = jwt.verify(token, "Secret-Key")
-        if (!decodedtoken) return res.status(400).send({ status: false, msg: "a valid token is required" })
 
         let toBeupdatedblogId = req.params.blogId
-        if (!toBeupdatedblogId) toBeupdatedblogId = req.query.blogId
-        let updatingAuthorId= await BlogModel.find({_id:toBeupdatedblogId}).select({authorId:1, _id:0})
-        let authorId= updatingAuthorId.map(x => x.authorId)
-        console.log(authorId)
-        let id = decodedtoken.userId
-        if (id != authorId) return res.status(403).send({ status: false, msg: "You are not authorised to perform this task" })
+        if (toBeupdatedblogId) {
+            let updatingAuthorId = await BlogModel.find({ _id: toBeupdatedblogId }).select({ authorId: 1, _id: 0 })
+            let authorId = updatingAuthorId.map(x => x.authorId)
+            console.log(authorId)
+            let id = decodedtoken.userId
+            if (id != authorId) return res.status(403).send({ status: false, msg: "You are not authorised to perform this task" })
+        }
+        else {
+            let AuthorId = req.query.authorId
+            toBeupdatedblogId = AuthorId
+            let id = decodedtoken.userId
+            if (id != AuthorId) return res.status(403).send({ status: false, msg: "You are not authorised to perform this task" })
+        }
         next()
     }
     catch (error) {
@@ -37,5 +43,5 @@ const authorisation = async function (req, res, next) {
 }
 
 
-module.exports.authorisation=authorisation
-module.exports.authentication=authentication
+module.exports.authorisation = authorisation
+module.exports.authentication = authentication
