@@ -2,21 +2,6 @@ const collegeModel = require("../models/collegeModel")
 const mongoose = require("mongoose")
 const internModel = require("../models/internModel")
 
-//const validation = function(data){
-  //  if(typeof(values) === "undefined" || data == null){ return false}
-//}
-
-
-// const createCollege = async (req,res)=>{
-//  try  { const data = req.body
-//     if(Object.keys(data)==0){ return res.status(400).send({staus :false , msg : "Input the data "})}
-//     const savedData = await collegeModel.create(data)
-//     return res.status(200).send({status : true , msg : savedata})}
-//     catch(error){
-//         return res.status(500).send({status :false, msg : error})
-//     }
-// }
-
 
 
 const isValid = function (value) {
@@ -52,7 +37,11 @@ const getData = async (req,res)=>{
   const {name ,fullname,logolink, interests } = saveData
   
   const data = await internModel.find({collegeId:saveData})//.populate("collegeId")
-   interests.push( data )
+
+  //const {name ,email, collegeId }= Notdata
+
+
+   interests.push( ...data )
     const Data = {name, fullname, logolink,interests }
 
   return res.status(200).send({status:true , msg:Data})
