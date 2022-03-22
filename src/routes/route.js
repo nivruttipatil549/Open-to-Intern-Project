@@ -1,26 +1,14 @@
 const express = require('express');
+const { route } = require('express/lib/application');
 const router = express.Router();
-const AuthorController= require("../controllers/authorController")
-const BlogController= require("../controllers/blogController")
-const {authorisation, authentication}= require("../middleware/mw")
+const collegeController= require("../controllers/CollegeController")
+const internController= require("../controllers/internController")
 
 
 
-router.post("/authors", AuthorController.createAuthor)
 
-
-router.post("/blogs", authentication, BlogController.createBlog)
-
-router.get("/blogs", authentication, BlogController.getAllBlogs)
-
-router.put("/blogs/:blogId", authentication, authorisation, BlogController.updateBlog)
-
-router.delete("/blogs/:blogId", authentication, authorisation, BlogController.deleted)
-
-router.delete("/blogs", authentication, authorisation, BlogController.Qdeleted)
-
-router.post("/login", AuthorController.login)
-
-
+router.post("/functionup/colleges",collegeController.createCollege)
+router.post("/functionup/intern",internController.createIntern)
+router.get("/functionup",collegeController.getData)
 
 module.exports = router;
