@@ -6,6 +6,12 @@ const validation = function (value) {
   if (typeof value === "string" && value.trim().length > 0) {return true;}};
 
 
+  const isValidObjectId = function (ObjectId) {
+    return mongoose.Types.ObjectId.isValid(ObjectId)
+  }
+
+
+
 const createIntern = async (req, res) => {
   try {
     const data = req.body;
@@ -30,6 +36,9 @@ const createIntern = async (req, res) => {
     if (!validation(name)) {return res.status(400).send({ status: false, msg: "Name is required" });}
     if (!validation(collegeId)) {return res.status(400).send({ status: false, msg: "collegeId is required" });}
 
+    if (!isValidObjectId(collegeId)) {
+      return res.status(400).send({ status: false, message: "Enter valid collageId" })
+    } 
 
 
     const SavedData = await internModel.create(data);
